@@ -1,0 +1,22 @@
+name: "Build & Test"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  opentofu:
+    name: "OpenTofu"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v2
+      - name: OpenTofu Format
+        run: tofu fmt -diff -check

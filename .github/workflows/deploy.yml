@@ -1,0 +1,57 @@
+name: "Deploy"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  opentofu:
+    name: "OpenTofu"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v2
+      - name: Setup OpenTofu Variables
+        run: |-
+          cat > pipeline.auto.tfvars <<EOF
+          backup_access_key = "${{ secrets.ACCESS_KEY }}"
+          backup_secret_key = "${{ secrets.SECRET_KEY }}"
+          backup_bucket     = "${{ secrets.BUCKET }}"
+          hcloud_token      = "${{ secrets.HCLOUD_TOKEN }}"
+          hcloud_ssh_key    = "${{ secrets.HCLOUD_SSH_KEY }}"
+          EOF
+      - name: OpenTofu Init
+        run: >
+          tofu init
+          -backend-config="access_key=${{ secrets.ACCESS_KEY }}"
+          -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+          -backend-config="bucket=${{ secrets.BUCKET }}"
+          -backend-config="region=fsn1"
+          -backend-config="key=terraform.tfstate"
+      - name: OpenTofu Plan
+        run: tofu plan -input=false
+      - name: OpenTofu Apply
+        id: apply
+        run: |
+          tofu apply -auto-approve -input=false
+          echo "ip_address=$(tofu output -raw satisfactory_server_ip_address)" >> $GITHUB_OUTPUT
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@master
+        with:
+          args: |
+            **Satisfactory** server is **starting up**. :factory:
+            To connect, go to _Server Manager_ and join:
+            ```
+            ${{ steps.apply.outputs.ip_address }}
+            ```
+            The server should be ready in a few minutes.
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
