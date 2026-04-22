@@ -22,19 +22,23 @@ jobs:
       - name: Setup OpenTofu Variables
         run: |-
           cat > pipeline.auto.tfvars <<EOF
-          backup_access_key = "${{ secrets.ACCESS_KEY }}"
-          backup_secret_key = "${{ secrets.SECRET_KEY }}"
-          backup_bucket     = "${{ secrets.BUCKET }}"
+          backup_access_key = "${{ secrets.BACKUP_ACCESS_KEY }}"
+          backup_secret_key = "${{ secrets.BACKUP_SECRET_KEY }}"
+          backup_bucket     = "${{ secrets.BACKUP_BUCKET }}"
+          backup_provider   = "${{ secrets.BACKUP_PROVIDER }}"
+          backup_region     = "${{ secrets.BACKUP_REGION }}"
+          backup_endpoint   = "${{ secrets.BACKUP_ENDPOINT }}"
           hcloud_token      = "${{ secrets.HCLOUD_TOKEN }}"
           hcloud_ssh_key    = "${{ secrets.HCLOUD_SSH_KEY }}"
           EOF
       - name: OpenTofu Init
         run: >
           tofu init
-          -backend-config="access_key=${{ secrets.ACCESS_KEY }}"
-          -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
-          -backend-config="bucket=${{ secrets.BUCKET }}"
-          -backend-config="region=fsn1"
+          -backend-config="access_key=${{ secrets.STATE_ACCESS_KEY }}"
+          -backend-config="secret_key=${{ secrets.STATE_SECRET_KEY }}"
+          -backend-config="bucket=${{ secrets.STATE_BUCKET }}"
+          -backend-config="region=${{ secrets.STATE_REGION }}"
+          -backend-config="endpoint=${{ secrets.STATE_ENDPOINT }}"
           -backend-config="key=terraform.tfstate"
       - name: OpenTofu Plan
         run: tofu plan -input=false

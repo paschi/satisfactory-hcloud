@@ -29,12 +29,12 @@ variable "game_max_players" {
 }
 
 variable "backup_bucket" {
-  type = string
+  type      = string
+  sensitive = true
 }
 
 variable "backup_provider" {
-  type    = string
-  default = "Hetzner"
+  type = string
 }
 
 variable "backup_access_key" {
@@ -48,13 +48,11 @@ variable "backup_secret_key" {
 }
 
 variable "backup_endpoint" {
-  type    = string
-  default = "https://fsn1.your-objectstorage.com"
+  type = string
 }
 
 variable "backup_region" {
-  type    = string
-  default = "fsn1"
+  type = string
 }
 
 variable "backup_cron_schedule" {

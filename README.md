@@ -14,18 +14,18 @@
 
 First, install [OpenTofu][uri-opentofu-install] if you have not already.
 
-As this project uses a remote backend for state management and stores backups in the cloud, you must first create an **S3-compatible bucket** (e.g. Hetzner Object Storage) and create access and secret keys for it.
+As this project uses a remote backend for state management and stores backups in the cloud, you must first create an **S3-compatible bucket** (e.g. Hetzner Object Storage, Scaleway, ...) and create access and secret keys for it.
 
 To be able to create resources in the Hetzner Cloud, you need to create an API token in your account.
 
-To configure the remote state, create a file named `terraform.tfbackend` with the following content:
+To configure the remote state, create a file named `terraform.tfvars` with the following content:
 
 ```hcl
 access_key = "<YOUR_BUCKET_ACCESS_KEY>"
 secret_key = "<YOUR_BUCKET_SECRET_KEY>"
 bucket     = "<YOUR_BUCKET_NAME>"
 region     = "<YOUR_BUCKET_REGION>"
-key        = "terraform.tfstate"
+endpoint   = "<YOUR_BUCKET_ENDPOINT>"
 ```
 
 Additionally, create a `terraform.tfvars` file to specify the required variables:
@@ -36,11 +36,14 @@ hcloud_ssh_key    = "<YOUR_SSH_PUBLIC_KEY>"
 backup_bucket     = "<YOUR_BUCKET_NAME>"
 backup_access_key = "<YOUR_BUCKET_ACCESS_KEY>"
 backup_secret_key = "<YOUR_BUCKET_SECRET_KEY>"
+backup_provider   = "<YOUR_BUCKET_PROVIDER>"
+backup_region     = "<YOUR_BUCKET_REGION>"
+backup_endpoint   = "<YOUR_BUCKET_ENDPOINT>"
 ```
 
 After that, initialize the OpenTofu configuration and deploy the resources:
 ```shell
-$ tofu init -backend-config=terraform.tfbackend
+$ tofu init -backend-config=terraform.tfvars
 $ tofu apply
 ```
 
