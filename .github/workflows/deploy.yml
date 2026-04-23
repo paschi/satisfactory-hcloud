@@ -52,10 +52,10 @@ jobs:
         with:
           args: |
             **Satisfactory** server is **starting up**. :factory:
-            To connect, go to _Server Manager_ and join:
+            The server should be ready in a few minutes.
+            To connect, open the _Server Manager_ and join:
             ```
             ${{ steps.apply.outputs.ip_address }}
             ```
-            The server should be ready in a few minutes.
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
