@@ -50,3 +50,12 @@ jobs:
             **Satisfactory** server has been **shut down**. :factory: :zzz:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Send Discord notification on failure
+        if: ${{ failure() }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: |
+            **Satisfactory** server **failed to stop**. :warning:
+            Please check build logs for details.
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
