@@ -7,14 +7,26 @@ permissions:
   id-token: write
   contents: read
 
+concurrency:
+  group: satisfactory-hcloud
+  cancel-in-progress: false
+
 jobs:
-  opentofu:
-    name: "OpenTofu"
+  deploy:
+    name: "Deploy server"
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
+      - name: Send Discord notification on workflow start
+        uses: Ilshidur/action-discord@master
+        with:
+          args: |
+            **Satisfactory** server is now **starting up**. :factory:
+            Please wait a few minutes. :hourglass:
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup OpenTofu
@@ -47,12 +59,12 @@ jobs:
         run: |
           tofu apply -auto-approve -input=false
           echo "ip_address=$(tofu output -raw satisfactory_server_ip_address)" >> $GITHUB_OUTPUT
-      - name: Send Discord notification
+      - name: Send Discord notification on success
         uses: Ilshidur/action-discord@master
         with:
           args: |
-            **Satisfactory** server is **starting up**. :factory:
-            The server should be ready in a few minutes.
+            **Satisfactory** server is **up**. :factory:
+            It may take a few minutes until it is available in-game.
             To connect, open the _Server Manager_ and join:
             ```
             ${{ steps.apply.outputs.ip_address }}

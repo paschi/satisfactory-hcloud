@@ -7,14 +7,26 @@ permissions:
   id-token: write
   contents: read
 
+concurrency:
+  group: satisfactory-hcloud
+  cancel-in-progress: false
+
 jobs:
-  opentofu:
-    name: "OpenTofu"
+  destroy:
+    name: "Destroy server"
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     steps:
+      - name: Send Discord notification on workflow start
+        uses: Ilshidur/action-discord@master
+        with:
+          args: |
+            **Satisfactory** server is now **shutting down**. :factory:
+            Please wait a few minutes. :hourglass:
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup OpenTofu
@@ -43,7 +55,7 @@ jobs:
       - name: OpenTofu Destroy
         id: destroy
         run: tofu destroy -auto-approve -input=false
-      - name: Send Discord notification
+      - name: Send Discord notification on success
         uses: Ilshidur/action-discord@master
         with:
           args: |
