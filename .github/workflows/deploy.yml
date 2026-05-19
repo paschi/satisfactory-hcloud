@@ -2,6 +2,12 @@ name: "Deploy"
 
 on:
   workflow_dispatch:
+    inputs:
+      disable_notifications:
+        description: "Disable Discord notifications"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   id-token: write
@@ -20,6 +26,7 @@ jobs:
         shell: bash
     steps:
       - name: Send Discord notification on workflow start
+        if: ${{ !inputs.disable_notifications }}
         uses: Ilshidur/action-discord@master
         with:
           args: |
@@ -60,6 +67,7 @@ jobs:
           tofu apply -auto-approve -input=false
           echo "ip_address=$(tofu output -raw satisfactory_server_ip_address)" >> $GITHUB_OUTPUT
       - name: Send Discord notification on success
+        if: ${{ success() && !inputs.disable_notifications }}
         uses: Ilshidur/action-discord@master
         with:
           args: |
@@ -72,7 +80,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Send Discord notification on failure
-        if: ${{ failure() }}
+        if: ${{ failure() && !inputs.disable_notifications }}
         uses: Ilshidur/action-discord@master
         with:
           args: |

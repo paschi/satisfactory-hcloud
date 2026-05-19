@@ -2,6 +2,12 @@ name: "Destroy"
 
 on:
   workflow_dispatch:
+    inputs:
+      disable_notifications:
+        description: "Disable Discord notifications"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   id-token: write
@@ -20,6 +26,7 @@ jobs:
         shell: bash
     steps:
       - name: Send Discord notification on workflow start
+        if: ${{ !inputs.disable_notifications }}
         uses: Ilshidur/action-discord@master
         with:
           args: |
@@ -56,6 +63,7 @@ jobs:
         id: destroy
         run: tofu destroy -auto-approve -input=false
       - name: Send Discord notification on success
+        if: ${{ success() && !inputs.disable_notifications }}
         uses: Ilshidur/action-discord@master
         with:
           args: |
@@ -63,7 +71,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Send Discord notification on failure
-        if: ${{ failure() }}
+        if: ${{ failure() && !inputs.disable_notifications }}
         uses: Ilshidur/action-discord@master
         with:
           args: |
